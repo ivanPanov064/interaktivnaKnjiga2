@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+  <meta charset="UTF-8">
+  <title>Virtuelna Biblioteka</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #1a1a1a; color: #f4f4f4; font-family: sans-serif; padding: 1em; }
+    #log { white-space: pre-wrap; background: #2b2b2b; padding: 1em; border-radius: 10px; height: 60vh; overflow-y: auto; margin-bottom: 1em; }
+    textarea { width: 100%; height: 80px; font-size: 1em; }
+    button { width: 100%; padding: 0.8em; font-size: 1em; margin-top: 0.5em; }
+  </style>
+</head>
+<body>
+  <h2>📖 Virtuelna Biblioteka</h2>
+  <div id="log">Učitavanje uvoda...</div>
+  <textarea id="userInput" placeholder="Upiši šta radiš..."></textarea>
+  <button onclick="sendMessage()">Pošalji</button>
+
+  <script>
+    const log = document.getElementById("log");
+    const input = document.getElementById("userInput");
+
+    const API_URL = "https://9030-213-196-101-160.ngrok-free.app"; // <--- replace with your ngrok URL
+
+    async function loadIntro() {
+      const res = await fetch(`${API_URL}/intro`);
+      const data = await res.json();
+      log.innerText = data.response;
+    }
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      log.innerText += `\n\n> ${message}`;
+      input.value = "";
+
+      const res = await fetch(`${API_URL}/play`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      log.innerText += `\n\n${data.response}`;
+      log.scrollTop = log.scrollHeight;
+    }
+
+    loadIntro();
+  </script>
+</body>
+</html>
